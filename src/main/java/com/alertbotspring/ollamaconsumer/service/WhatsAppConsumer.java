@@ -1,6 +1,6 @@
 package com.alertbotspring.ollamaconsumer.service;
 
-import com.alertbotspring.avro.WhatsAppMessage;
+import com.alertbot.avro.WhatsAppMessage;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
