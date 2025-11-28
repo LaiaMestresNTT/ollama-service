@@ -13,6 +13,9 @@ spring:
 
   kafka:
     bootstrap-servers: broker:29092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
     consumer:
       group-id: whatsapp-in-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
