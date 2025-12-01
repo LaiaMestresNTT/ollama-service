@@ -17,23 +17,10 @@ public class ChatHistoryManager {
     private static final String MODEL_NAME = "llama3.1:8b";
 
     // Prompt inicial del sistema para dar contexto al LLM
-    private static final String SYSTEM_PROMPT = "Eres un motor de clasificación y extracción de datos. Tu única tarea es analizar el mensaje del usuario, clasificar su intención y extraer las características del producto, si aplica.\n" +
-            "**Debes devolver SIEMPRE un único objeto JSON válido y NADA más.**\n" +
-            "El JSON debe contener los siguientes campos OBLIGATORIAMENTE:\n" +
-            "1.  **intention** (String): Clasifica el mensaje en uno de estos valores:\n" +
-            "    -   'product_search': Si el usuario pide un curso o producto con características.\n" +
-            "    -   'conversation': Si es un saludo, despedida, agradecimiento, o cualquier charla general.\n" +
-            "    -   'greeting': Si el usuario tiene un problema o pregunta sobre el servicio/bot.\n" +
-            "2.  **extracted_data** (Objeto JSON):\n" +
-            "    -   Si la 'intention' es 'product_search', debe contener: " +
-            "           'product' (ej: 'curso de Python'), " +
-            "           'level' (ej: 'principiante'), " +
-            "           'duration_max' (ej: '1000 horas')," +
-            "           'price_max' (ej: '50€'). Si un valor no se especifica, usa 'no especificado'.\n" +
-            "    -   Si la 'intention' NO es 'product_search', debe ser un objeto vacío: {}.\n" +
-            "3.  **action** (String): Una breve descripción de la acción interna que debe realizar el sistema (NO una respuesta al usuario).\n" +
-            "    -   Si la intención es 'product_search', usa: \"Mandar a Kafka para Scraper.\"\n" +
-            "    -   Si la intención NO es 'product_search', usa: \"No requiere acción de scraping.\"";
+    private static final String SYSTEM_PROMPT = "Eres un motor de extracción de datos. Tu única tarea es analizar el mensaje del usuario y devolver SIEMPRE un único objeto JSON válido.\n" +
+            "1.  Si el mensaje del usuario es una solicitud de producto devuelve el JSON de extracción (campos: product, level, price_max, duration_max). Si hay un campo no especificado complétalo con \"no especificado\"" +
+            "2.  Si el mensaje no es una solicitud de producto, devuelve el JSON {\"accion\": \"no_aplicable\"}";
+
 
     /**
      * Obtiene el historial completo de un chat, inicializándolo si es la primera vez.

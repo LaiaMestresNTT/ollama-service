@@ -3,7 +3,6 @@ package com.alertbotspring.ollamaconsumer.kafka;
 import com.alertbotspring.ollamaconsumer.service.ExtractionRouterService;
 import com.alertbot.avro.WhatsAppMessage;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service

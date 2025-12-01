@@ -2,9 +2,9 @@ package com.alertbotspring.ollamaconsumer.service;
 
 import com.alertbotspring.ollamaconsumer.kafka.ScraperProducer;
 import com.alertbotspring.ollamaconsumer.model.ExtractedData;
-import com.alertbotspring.ollamaconsumer.model.LlamaResponseFormat;
 import com.alertbotspring.ollamaconsumer.model.Message;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
@@ -49,18 +49,21 @@ public class ExtractionRouterService {
                     .replace("```json", "")
                     .replace("```", "")
                     .trim();
-            LlamaResponseFormat llamaResponseFormat = objectMapper.readValue(cleanedJsonContent, LlamaResponseFormat.class);
-            System.out.println("JSON parseado a LlamaResponseFormat: " + llamaResponseFormat);
+
+            JsonNode rootNode = objectMapper.readTree(cleanedJsonContent);
+            System.out.println("JSON parseado a LlamaResponseFormat: " + rootNode);
 
             // 3. Routing basado en la intención
-            if ("product_search".equals(llamaResponseFormat.getIntention())) {
+            if (rootNode.has("accion") && "no_aplicable".equals(rootNode.get("accion").asText())) {
+               // NO RESPONDER Y BORRAR EL HISTORIAL
+                history.remove(history.size() - 1);
+
+            } else {
+
                 String TOPIC = "nlp_results";
 
-                // Convertir los datos de extracción a JSON para Kafka
-                //String extractionDataJson = objectMapper.writeValueAsString(llamaResponseFormat.getExtracted_data());
-
                 // Enviar a Kafka para iniciar el proceso de scraping
-                ExtractedData extractedData = llamaResponseFormat.getExtracted_data();
+                ExtractedData extractedData = objectMapper.treeToValue(rootNode, ExtractedData.class);
                 scraperProducer.sendMessage(TOPIC, extractedData, chatId);
 
                 // Mensaje fijo de confirmación para el usuario
@@ -68,13 +71,6 @@ public class ExtractionRouterService {
 
                 // Añadir el mensaje de confirmación al historial
                 historyManager.addAssistantMessage(chatId, confirmationMessage);
-
-            } else {
-
-                // Nota: Usamos la "action" como placeholder interno para el historial
-                historyManager.addAssistantMessage(chatId, llamaResponseFormat.getAction());
-
-                // Devolver cadena vacía: indica a la capa de WhatsApp que NO debe responder
             }
 
         } catch (JsonProcessingException e) {

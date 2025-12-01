@@ -2,7 +2,6 @@ package com.alertbotspring.ollamaconsumer.kafka;
 
 import com.alertbot.avro.ExtractedProduct;
 import com.alertbotspring.ollamaconsumer.model.ExtractedData;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -10,11 +9,9 @@ import org.springframework.stereotype.Service;
 public class ScraperProducer {
 
     private final KafkaTemplate<String, ExtractedProduct> kafkaTemplate;
-    private final ObjectMapper objectMapper;
 
-    public ScraperProducer(KafkaTemplate<String, ExtractedProduct> kafkaTemplate, ObjectMapper objectMapper) {
+    public ScraperProducer(KafkaTemplate<String, ExtractedProduct> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
-        this.objectMapper = objectMapper;
     }
 
     // Manda el producto extraido por OllamaChatService al topico de nlp_results
