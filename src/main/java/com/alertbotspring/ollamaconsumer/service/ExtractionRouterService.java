@@ -51,7 +51,7 @@ public class ExtractionRouterService {
                     .trim();
 
             JsonNode rootNode = objectMapper.readTree(cleanedJsonContent);
-            System.out.println("JSON parseado a LlamaResponseFormat: " + rootNode);
+            System.out.println("JSON parseado al formato: " + rootNode);
 
             // 3. Routing basado en la intención
             if (rootNode.has("accion") && "no_aplicable".equals(rootNode.get("accion").asText())) {
@@ -64,6 +64,7 @@ public class ExtractionRouterService {
 
                 // Enviar a Kafka para iniciar el proceso de scraping
                 ExtractedData extractedData = objectMapper.treeToValue(rootNode, ExtractedData.class);
+                System.out.println("Hemos llegado: " + extractedData);
                 scraperProducer.sendMessage(TOPIC, extractedData, chatId);
 
                 // Mensaje fijo de confirmación para el usuario
