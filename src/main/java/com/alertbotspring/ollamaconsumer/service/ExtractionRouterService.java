@@ -37,7 +37,7 @@ public class ExtractionRouterService {
         Message userMessage = new Message("user", userPrompt);
         history.add(userMessage);
 
-        System.out.println("Historial: " + userMessage);
+        System.out.println("Historial:  " + userMessage);
 
         try {
             // 1. Llamar a Llama para obtener el JSON de extracción/clasificación
