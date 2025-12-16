@@ -59,6 +59,12 @@ jobs:
         with:
           name: app-jar
           path: build/
+
+
+      
+      - name: Mostrar archivos en build
+        run: ls -l build
+
  
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
