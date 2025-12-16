@@ -28,7 +28,7 @@ public class ScraperProducer {
 
         try {
             kafkaTemplate.send(TOPIC, avroProduct);
-            System.out.println("🚀 Mensaje enviado a Kafka Topic   [" + TOPIC + "]: " + avroProduct);
+            System.out.println("🚀 Mensaje enviado a Kafka Topic [" + TOPIC + "]: " + avroProduct);
         } catch (Exception e) {
             System.err.println("❌ ERROR al enviar mensaje a Kafka: " + e.getMessage());
         }
