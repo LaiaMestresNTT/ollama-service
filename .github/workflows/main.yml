@@ -88,7 +88,7 @@ jobs:
       - name: Colocar el JAR en target/
         run: |
           mkdir -p target
-          cp build/*.jar target/
+          cp build/target/*.jar target/
           ls -la target
 
       - name: Construir y publicar imagen
