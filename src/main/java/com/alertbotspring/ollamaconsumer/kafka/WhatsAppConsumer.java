@@ -23,7 +23,7 @@ public class WhatsAppConsumer {
         String userPrompt = whatsAppMessage.getText().toString();
 
         if (chatId.isEmpty() || userPrompt.isEmpty()) {
-            System.out.println("Mensaje de Kafka recibido con chatId o texto nulos. Ignorando.");
+            System.out.println("Mensaje de Kafka recibido con chatId o texto nulos. Ignorando...");
             return;
         }
 
