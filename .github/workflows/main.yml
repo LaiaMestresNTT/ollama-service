@@ -57,7 +57,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: app-jar
-          path: build/
+          path: target/
  
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
