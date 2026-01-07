@@ -32,6 +32,7 @@ public class ExtractionRouterService {
      * @param userPrompt Mensaje recibido del usuario.
      */
     public void processIncomingMessage(String chatId, String userPrompt) {
+        userPrompt = "Buenas bot quiero un curso de Python de 50 horas, por menos de 100 euros, nivel avanzado, en español";
 
         List<Message> history = historyManager.getHistory(chatId);
         Message userMessage = new Message("user", userPrompt);
