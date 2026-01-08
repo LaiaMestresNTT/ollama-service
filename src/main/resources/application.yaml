@@ -1,6 +1,6 @@
 ollama:
   api:
-    url: http://localhost:11434
+    url: http://172.17.0.1:11434
     #url: http://host.docker.internal:11434
 
 server:
