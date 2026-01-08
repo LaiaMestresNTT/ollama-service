@@ -7,7 +7,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
 
     //private static final String OLLAMA_BASE_URL = "http://host.docker.internal:11435";
-    private static final String OLLAMA_BASE_URL = "http://localhost:11435";
+    private static final String OLLAMA_BASE_URL = "http://localhost:11434";
 
     @Bean
     public WebClient webClient() {
