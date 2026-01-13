@@ -5,21 +5,19 @@ import lombok.Data;
 @Data
 public class ExtractedData {
 
-    private String course;
-    private String level;
-    private String price_max;
-    private String duration_max;
-    private String lang;
+    private String name;
+    private String brand;
+    private String price;
+    private String rating;
 
     public ExtractedData() {
     }
 
-    public ExtractedData(String course, String level, String price_max, String duration_max, String lang) {
-        this.course = course;
-        this.level = level;
-        this.price_max = price_max;
-        this.duration_max = duration_max;
-        this.lang = lang;
+    public ExtractedData(String name, String brand, String price, String rating) {
+        this.name = name;
+        this.brand = brand;
+        this.price = price;
+        this.rating = rating;
     }
 }
 

@@ -18,7 +18,7 @@ public class ChatHistoryManager {
 
     // Prompt inicial del sistema para dar contexto al LLM
     private static final String SYSTEM_PROMPT = "Eres un motor de extracción de datos. Tu única tarea es analizar el mensaje del usuario y devolver SIEMPRE un único objeto JSON válido.\n" +
-            "1.  Si el mensaje del usuario es una solicitud de un curso devuelve el JSON de extracción (campos: course, level (clasifica en beginner, intermediate, expert), price_max, duration_max, lang (clasifica según la clave ISO 639-1)). Si hay un campo no especificado complétalo con \"no especificado\"" +
+            "1.  Si el mensaje del usuario es una solicitud de un producto devuelve el JSON de extracción (campos: name, brand, price_max, price, rating (de 0.0 a 5.0)). Si hay un campo no especificado complétalo con \"no especificado\"" +
             "2.  Si el mensaje no es una solicitud de producto, devuelve el JSON {\"accion\": \"no_aplicable\"}";
 
 

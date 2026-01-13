@@ -19,11 +19,10 @@ public class ScraperProducer {
 
         ExtractedProduct avroProduct = ExtractedProduct.newBuilder()
                 .setId(chatId)
-                .setCourse(extractedData.getCourse())
-                .setLevel(extractedData.getLevel())
-                .setPriceMax(extractedData.getPrice_max())
-                .setDurationMax(extractedData.getDuration_max())
-                .setLang(extractedData.getLang())
+                .setName(extractedData.getName())
+                .setBrand(extractedData.getBrand())
+                .setPrice(extractedData.getPrice())
+                .setRating(extractedData.getRating())
                 .build();
 
         try {
