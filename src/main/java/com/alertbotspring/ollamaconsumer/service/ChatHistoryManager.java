@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class ChatHistoryManager {
 
-    // Almacenamiento en memoria: Clave (chatId de WhatsApp) -> Valor (Lista de Mensajes)
+    // Almacenamiento en memoria: Clave (userId de WhatsApp) -> Valor (Lista de Mensajes)
     private final Map<String, List<Message>> chatHistories = new ConcurrentHashMap<>();
     // Configuración del modelo
     private static final String MODEL_NAME = "llama3.1:8b";
@@ -24,12 +24,12 @@ public class ChatHistoryManager {
 
     /**
      * Obtiene el historial completo de un chat, inicializándolo si es la primera vez.
-     * @param chatId ID del chat de WhatsApp.
+     * @param userId ID del chat de WhatsApp.
      * @return Lista mutable de mensajes (incluyendo el mensaje de sistema inicial).
      */
-    public List<Message> getHistory(String chatId) {
+    public List<Message> getHistory(String userId) {
         // computeIfAbsent crea la entrada si no existe, garantizando que siempre hay una lista
-        return chatHistories.computeIfAbsent(chatId, k -> {
+        return chatHistories.computeIfAbsent(userId, k -> {
             List<Message> initialHistory = new ArrayList<>();
             // Añadir el mensaje de sistema como el primer elemento
             initialHistory.add(new Message("system", SYSTEM_PROMPT));
@@ -39,17 +39,17 @@ public class ChatHistoryManager {
 
     /**
      * Limpia el historial de un chat específico (similar al comando !reset).
-     * @param chatId ID del chat de WhatsApp.
+     * @param userId ID del chat de WhatsApp.
      */
-    public void resetHistory(String chatId) {
-        chatHistories.remove(chatId);
+    public void resetHistory(String userId) {
+        chatHistories.remove(userId);
     }
 
     /**
      * Añade un mensaje del asistente al historial.
      */
-    public void addAssistantMessage(String chatId, String content) {
-        List<Message> history = chatHistories.get(chatId);
+    public void addAssistantMessage(String userId, String content) {
+        List<Message> history = chatHistories.get(userId);
         if (history != null) {
             history.add(new Message("assistant", content));
         }

@@ -13,16 +13,22 @@ spring:
 
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:broker:9092}
+    properties:
+      #schema.registry.url: ${SCHEMA_REGISTRY_URL:http://schema-registry:8081}
+      schema.registry.url: ${SPRING_CLOUD_SCHEMA_REGISTRY_CLIENT_ENDPOINT:http://schema-registry:8081}
+
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      properties:
+        value.subject.name.strategy: io.confluent.kafka.serializers.subject.TopicNameStrategy
+
     consumer:
       group-id: whatsapp-in-group
       key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       auto-offset-reset: earliest
-    properties:
-      spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
-      spring.deserializer.value.delegate.class: io.confluent.kafka.serializers.KafkaAvroDeserializer
-      schema.registry.url: ${SPRING_CLOUD_SCHEMA_REGISTRY_CLIENT_ENDPOINT:http://schema-registry:8081}
-      specific.avro.reader: true
+      properties:
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: io.confluent.kafka.serializers.KafkaAvroDeserializer
+        specific.avro.reader: true
