@@ -64,6 +64,8 @@ public class ExtractionRouterService {
 
                 // Enviar a Kafka para iniciar el proceso de scraping
                 ExtractedData extractedData = objectMapper.treeToValue(rootNode, ExtractedData.class);
+                extractedData.setUser_id(userId); // Inyectar manualmente el userId
+
                 System.out.println("Hemos llegado: " + extractedData);
                 scraperProducer.sendMessage(TOPIC, extractedData, userId);
 
