@@ -12,10 +12,12 @@ spring:
     web-application-type: reactive
 
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:broker:9092}
+    #bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:broker:9092}
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     properties:
       #schema.registry.url: ${SCHEMA_REGISTRY_URL:http://schema-registry:8081}
-      schema.registry.url: ${SPRING_CLOUD_SCHEMA_REGISTRY_CLIENT_ENDPOINT:http://schema-registry:8081}
+      schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
+      #schema.registry.url: ${SPRING_CLOUD_SCHEMA_REGISTRY_CLIENT_ENDPOINT:http://schema-registry:8081}
 
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer

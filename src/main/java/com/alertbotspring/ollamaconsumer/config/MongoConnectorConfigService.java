@@ -15,7 +15,7 @@ import java.util.Map;
 public class MongoConnectorConfigService {
 
     private final WebClient webClient;
-    private final String CONNECT_URL = "http://connect:8083/connectors";
+    private final String CONNECT_URL = "http://localhost:8083/connectors"; // ollama-service esta fuera de la red de los contenedores
 
     public MongoConnectorConfigService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.build();
@@ -61,8 +61,11 @@ public class MongoConnectorConfigService {
                         .toBodilessEntity())
                 .retryWhen(Retry.fixedDelay(5, Duration.ofSeconds(10))) // Reintenta 5 veces cada 10 seg
                 .subscribe(
-                        res -> System.out.println("✅ Mongo Sink Connector configurado con éxito."),
-                        err -> System.err.println("❌ Error crítico: Kafka Connect no disponible tras reintentos.")
+                        res -> System.out.println("✅ Conector registrado: " + res.getStatusCode()),
+                        err -> {
+                            System.err.println("❌ ERROR AL REGISTRAR CONECTOR: " + err.getMessage());
+                            err.printStackTrace(); // Esto te dirá si es un Connection Refused
+                        }
                 );
     }
 }
