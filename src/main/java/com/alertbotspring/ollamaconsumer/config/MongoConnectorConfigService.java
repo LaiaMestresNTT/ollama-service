@@ -10,7 +10,7 @@ public class MongoConnectorConfigService {
 
     private final WebClient webClient;
     // URL de Kafka Connect dentro de la red de Docker
-    private final String CONNECT_URL = "http://kafka-connect:8083/connectors";
+    private final String CONNECT_URL = "http://connect:8083/connectors";
 
     public MongoConnectorConfigService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.build();
