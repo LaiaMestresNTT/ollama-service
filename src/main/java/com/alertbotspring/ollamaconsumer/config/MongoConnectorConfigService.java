@@ -1,26 +1,35 @@
 package com.alertbotspring.ollamaconsumer.config;
 
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import jakarta.annotation.PostConstruct;
+import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
+
+import java.time.Duration;
 import java.util.Map;
 
 @Service
 public class MongoConnectorConfigService {
 
     private final WebClient webClient;
-    // URL de Kafka Connect dentro de la red de Docker
     private final String CONNECT_URL = "http://connect:8083/connectors";
 
     public MongoConnectorConfigService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.build();
     }
 
-    @PostConstruct
+    // Cambiamos @PostConstruct por este listener
+    @EventListener(ApplicationReadyEvent.class)
     public void setupConnector() {
         String connectorName = "mongo-sink-nlp-results";
 
-        // Definición del JSON de configuración
+        // IMPORTANTE: Verifica que el campo de ID coincida con tu nuevo AVRO
+        // Si ahora usas "request_id", cámbialo aquí abajo:
+        String idFieldName = "request_id";
+
         Map<String, Object> config = Map.ofEntries(
                 Map.entry("connector.class", "com.mongodb.kafka.connect.MongoSinkConnector"),
                 Map.entry("tasks.max", "1"),
@@ -31,37 +40,29 @@ public class MongoConnectorConfigService {
                 Map.entry("key.converter", "org.apache.kafka.connect.storage.StringConverter"),
                 Map.entry("value.converter", "io.confluent.connect.avro.AvroConverter"),
                 Map.entry("value.converter.schema.registry.url", "http://schema-registry:8081"),
-                Map.entry("value.converter.value.subject.name.strategy", "io.confluent.kafka.serializers.subject.TopicNameStrategy"),
-
-                // Estrategia de ID: Usar el campo "id" generado como UUID en Java
                 Map.entry("document.id.strategy", "com.mongodb.kafka.connect.sink.processor.id.strategy.PartialValueStrategy"),
                 Map.entry("document.id.strategy.partial.value.projection.type", "allowlist"),
-                Map.entry("document.id.strategy.partial.value.projection.list", "id"),
+                Map.entry("document.id.strategy.partial.value.projection.list", idFieldName),
                 Map.entry("writemodel.strategy", "com.mongodb.kafka.connect.sink.writemodel.strategy.ReplaceOneBusinessKeyStrategy")
         );
 
-        Map<String, Object> requestBody = Map.of(
-                "name", connectorName,
-                "config", config
-        );
+        Map<String, Object> requestBody = Map.of("name", connectorName, "config", config);
 
-        // Lógica de registro: Primero intentamos borrar el viejo para actualizar, luego creamos
+        // Flujo reactivo con REINTENTOS
         webClient.delete()
                 .uri(CONNECT_URL + "/" + connectorName)
                 .retrieve()
-                // Ignoramos el error si el conector no existía previamente
-                .onStatus(status -> status.is4xxClientError(), response -> null)
+                .onStatus(HttpStatusCode::is4xxClientError, response -> Mono.empty())
                 .toBodilessEntity()
-                .subscribe(unused -> {
-                    webClient.post()
-                            .uri(CONNECT_URL)
-                            .bodyValue(requestBody)
-                            .retrieve()
-                            .toBodilessEntity()
-                            .subscribe(
-                                    res -> System.out.println("✅ Mongo Sink Connector configurado con éxito."),
-                                    err -> System.err.println("❌ Error al configurar el conector: " + err.getMessage())
-                            );
-                });
+                .flatMap(unused -> webClient.post()
+                        .uri(CONNECT_URL)
+                        .bodyValue(requestBody)
+                        .retrieve()
+                        .toBodilessEntity())
+                .retryWhen(Retry.fixedDelay(5, Duration.ofSeconds(10))) // Reintenta 5 veces cada 10 seg
+                .subscribe(
+                        res -> System.out.println("✅ Mongo Sink Connector configurado con éxito."),
+                        err -> System.err.println("❌ Error crítico: Kafka Connect no disponible tras reintentos.")
+                );
     }
 }
