@@ -27,26 +27,7 @@ public class MongoConnectorConfigService {
         String connectorName = "mongo-sink-nlp-results";
 
         // IMPORTANTE: Verifica que el campo de ID coincida con tu nuevo AVRO
-        // Si ahora usas "request_id", cámbialo aquí abajo:
-        String idFieldName = "request_id";
-
-        Map<String, Object> config = Map.ofEntries(
-                Map.entry("connector.class", "com.mongodb.kafka.connect.MongoSinkConnector"),
-                Map.entry("tasks.max", "1"),
-                Map.entry("topics", "nlp_results"),
-                Map.entry("connection.uri", "mongodb://mongodb_container:27017/?replicaSet=rs0"),
-                Map.entry("database", "alertbot_db"),
-                Map.entry("collection", "product_requests"),
-                Map.entry("key.converter", "org.apache.kafka.connect.storage.StringConverter"),
-                Map.entry("value.converter", "io.confluent.connect.avro.AvroConverter"),
-                Map.entry("value.converter.schema.registry.url", "http://schema-registry:8081"),
-                Map.entry("document.id.strategy", "com.mongodb.kafka.connect.sink.processor.id.strategy.PartialValueStrategy"),
-                Map.entry("document.id.strategy.partial.value.projection.type", "allowlist"),
-                Map.entry("document.id.strategy.partial.value.projection.list", idFieldName),
-                Map.entry("writemodel.strategy", "com.mongodb.kafka.connect.sink.writemodel.strategy.ReplaceOneBusinessKeyStrategy")
-        );
-
-        Map<String, Object> requestBody = Map.of("name", connectorName, "config", config);
+        Map<String, Object> requestBody = getRequestBody(connectorName);
 
         // Flujo reactivo con REINTENTOS
         webClient.delete()
@@ -67,5 +48,28 @@ public class MongoConnectorConfigService {
                             err.printStackTrace(); // Esto te dirá si es un Connection Refused
                         }
                 );
+    }
+
+    private static Map<String, Object> getRequestBody(String connectorName) {
+        String idFieldName = "request_id";
+
+        Map<String, Object> config = Map.ofEntries(
+                Map.entry("connector.class", "com.mongodb.kafka.connect.MongoSinkConnector"),
+                Map.entry("tasks.max", "1"),
+                Map.entry("topics", "nlp_results"),
+                Map.entry("connection.uri", "mongodb://mongodb_container:27017/?replicaSet=rs0"),
+                Map.entry("database", "alertbot_db"),
+                Map.entry("collection", "product_requests"),
+                Map.entry("key.converter", "org.apache.kafka.connect.storage.StringConverter"),
+                Map.entry("value.converter", "io.confluent.connect.avro.AvroConverter"),
+                Map.entry("value.converter.schema.registry.url", "http://schema-registry:8081"),
+                Map.entry("document.id.strategy", "com.mongodb.kafka.connect.sink.processor.id.strategy.PartialValueStrategy"),
+                Map.entry("document.id.strategy.partial.value.projection.type", "allowlist"),
+                Map.entry("document.id.strategy.partial.value.projection.list", idFieldName),
+                Map.entry("writemodel.strategy", "com.mongodb.kafka.connect.sink.writemodel.strategy.ReplaceOneBusinessKeyStrategy")
+        );
+
+        Map<String, Object> requestBody = Map.of("name", connectorName, "config", config);
+        return requestBody;
     }
 }
