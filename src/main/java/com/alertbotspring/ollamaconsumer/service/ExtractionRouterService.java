@@ -35,6 +35,7 @@ public class ExtractionRouterService {
 
         List<Message> history = historyManager.getHistory(userId);
         Message userMessage = new Message("user", userPrompt);
+
         history.add(userMessage);
 
         System.out.println("Historial:  " + userMessage);
@@ -59,21 +60,13 @@ public class ExtractionRouterService {
                 history.remove(history.size() - 1);
 
             } else {
-
-                String TOPIC = "nlp_results";
-
-                // Enviar a Kafka para iniciar el proceso de scraping
+                // Mapeamos el JSON con la clase ExtractedData
                 ExtractedData extractedData = objectMapper.treeToValue(rootNode, ExtractedData.class);
                 extractedData.setUser_id(userId); // Inyectar manualmente el userId
 
-                System.out.println("Hemos llegado: " + extractedData);
+                // Enviar a Kafka para iniciar el proceso de scraping
+                String TOPIC = "nlp_results";
                 scraperProducer.sendMessage(TOPIC, extractedData, userId);
-
-                // Mensaje fijo de confirmación para el usuario
-                String confirmationMessage = "¡Perfecto! Hemos recibido tu solicitud. Estoy buscando el producto y te notificaré con la mejor opción tan pronto como la tenga.";
-
-                // Añadir el mensaje de confirmación al historial
-                historyManager.addAssistantMessage(userId, confirmationMessage);
             }
 
         } catch (JsonProcessingException e) {

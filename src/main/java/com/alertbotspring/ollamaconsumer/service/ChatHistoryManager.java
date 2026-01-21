@@ -17,8 +17,8 @@ public class ChatHistoryManager {
     private static final String MODEL_NAME = "llama3.1:8b";
 
     // Prompt inicial del sistema para dar contexto al LLM
-    private static final String SYSTEM_PROMPT = "Eres un motor de extracción de datos. Tu única tarea es analizar el mensaje del usuario y devolver SIEMPRE un único objeto JSON válido.\n" +
-            "1.  Si el mensaje del usuario es una solicitud de un producto devuelve el JSON de extracción (campos: name (producto a buscar), brand (nombre de la marca), price (número del precio máximo), rating (número)). Si hay un campo no especificado complétalo con \"no especificado\"" +
+    private static final String SYSTEM_PROMPT = "Eres un motor de extracción de datos. Tu única tarea es analizar el mensaje del usuario y devolver SIEMPRE un ÚNICO objeto JSON válido.\n" +
+            "1.  Si el mensaje del usuario es una solicitud de un producto devuelve el JSON de extracción (campos: name (producto a buscar), brand (nombre de la marca), price (número del precio), rating (número)). Si hay un campo no especificado complétalo con \"no especificado\"" +
             "2.  Si el mensaje no es una solicitud de producto, devuelve el JSON {\"accion\": \"no_aplicable\"}";
 
 
@@ -28,13 +28,41 @@ public class ChatHistoryManager {
      * @return Lista mutable de mensajes (incluyendo el mensaje de sistema inicial).
      */
     public List<Message> getHistory(String userId) {
-        // computeIfAbsent crea la entrada si no existe, garantizando que siempre hay una lista
-        return chatHistories.computeIfAbsent(userId, k -> {
+        // Si no existe el historial, lo crea con el System Prompt y lo devuelve
+        List<Message> history = chatHistories.computeIfAbsent(userId, k -> {
             List<Message> initialHistory = new ArrayList<>();
-            // Añadir el mensaje de sistema como el primer elemento
             initialHistory.add(new Message("system", SYSTEM_PROMPT));
             return initialHistory;
         });
+
+        // Si ya existe comprobamos si hay que recortar (más de 6 mensajes)
+        if (history.size() >= 5) {
+            history = trimHistory(userId, history);
+            // Volvemos a obtener la lista ya actualizada después del recorte
+        }
+        return history;
+    }
+
+    /**
+    * Función para mantener el tamaño del historial
+    */
+
+    public List<Message> trimHistory(String userId, List<Message> history) {
+        int maxMessages = 4;
+
+        // Mantenemos el SYSTEM_PROMPT (índice 0) y los últimos N mensajes
+        Message systemPrompt = history.getFirst();
+        List<Message> recentContext = history.subList(history.size() - maxMessages, history.size());
+
+        // Creamos la nueva lista de mensajes
+        List<Message> newHistory = new ArrayList<>();
+        newHistory.add(systemPrompt);
+        newHistory.addAll(recentContext);
+
+        // Añadimos la nueva lista a chatHistories
+        chatHistories.put(userId, newHistory);
+
+        return newHistory;
     }
 
     /**
@@ -55,10 +83,4 @@ public class ChatHistoryManager {
         }
     }
 
-    /**
-     * Obtiene el nombre del modelo.
-     */
-    public String getModelName() {
-        return MODEL_NAME;
-    }
 }
