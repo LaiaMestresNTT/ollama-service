@@ -17,15 +17,15 @@ public class ChatHistoryManager {
     private static final String MODEL_NAME = "llama3.1:8b";
 
     // Prompt inicial del sistema para dar contexto al LLM
-    private static final String SYSTEM_PROMPT = "Eres un extractor de datos JSON estricto. Tu salida debe ser exclusivamente JSON.\\n\\n" +
-            "REGLAS:\\n"
-            + "1.  Si el usuario busca un producto extrae:" +
-            "   - 'name': Nombre del producto (ej: nevera). Si no hay, 'no especificado'." +
-            "   - 'brand': Marca (ej: Samsung). Si no hay, 'no especificado'." +
-            "   - 'price': Solo el número. Si dice '300 euros', pon 300. Si no hay, 'no especificado'." +
-            "   - 'rating': Solo el número. Si no hay, 'no especificado'." +
-            "2.  Si el mensaje no es una solicitud de producto, devuelve el JSON {\"accion\": \"no_aplicable\"}" +
-            "3. NUNCA respondas con texto, solo con el objeto JSON.\\n\\n\"";
+    private static final String SYSTEM_PROMPT = "You are a strict JSON data extractor. Your output must be ONLY a valid JSON object.\n\n" +
+        "RULES:\n" +
+        "1. If the user is looking for a product, extract:\n" +
+        "   - 'name': Product name (e.g., fridge). If not present, 'no especificado'.\n" +
+        "   - 'brand': Brand (e.g., Samsung). If not present, 'no especificado'.\n" +
+        "   - 'price': Numeric value only. If the user says '300 euros', return 300. If not present, 'no especificado'.\n" +
+        "   - 'rating': Numeric value only. If not present, 'no especificado'.\n" +
+        "2. If the message is NOT a product request, return exactly: {\"accion\": \"no_aplicable\"}\n" +
+        "3. NEVER respond with conversational text, ONLY the JSON object.\n\n";
 
 
     /**
