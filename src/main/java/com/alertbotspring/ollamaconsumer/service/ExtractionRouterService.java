@@ -45,13 +45,8 @@ public class ExtractionRouterService {
             String jsonContent = ollamaModelService.callLlamaApi(history);
             System.out.println("JSON extraído: " + jsonContent);
 
-            // 2. Parsear el JSON
-            String cleanedJsonContent = jsonContent.trim()
-                    .replace("```json", "")
-                    .replace("```", "")
-                    .trim();
-
-            JsonNode rootNode = objectMapper.readTree(cleanedJsonContent);
+            // 2. Parsear + mapear el contenido extraído
+            JsonNode rootNode = stringToJson(jsonContent);
             System.out.println("JSON parseado al formato: " + rootNode);
 
             // 3. Routing basado en la intención
@@ -61,8 +56,7 @@ public class ExtractionRouterService {
 
             } else {
                 // Mapeamos el JSON con la clase ExtractedData
-                ExtractedData extractedData = objectMapper.treeToValue(rootNode, ExtractedData.class);
-                extractedData.setUser_id(userId); // Inyectar manualmente el userId
+                ExtractedData extractedData = jsonToExtractedData(rootNode, userId);
 
                 // Enviar a Kafka para iniciar el proceso de scraping
                 String TOPIC = "nlp_results";
@@ -75,7 +69,41 @@ public class ExtractionRouterService {
             history.remove(history.size() - 1);
         } catch (RuntimeException e) {
             System.err.println("Error de comunicación con LLM: " + e.getMessage());
+            // Si falla el modelo, revertir el historial (quitar el userPrompt)
             history.remove(history.size() - 1);
         }
+    }
+
+    private JsonNode stringToJson (String jsonContent) throws JsonProcessingException {
+        return objectMapper.readTree(extractJson(jsonContent));
+    }
+
+    private String extractJson (String rawContent) {
+        if (rawContent == null || rawContent.isEmpty()) {
+            return "{}";
+        }
+
+        // Limpieza básica
+        String cleanedJsonContent = rawContent.trim()
+                .replace("```json", "")
+                .replace("```", "")
+                .trim();
+
+        // Limpieza con Regex para encontrar '{', '}'
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\{.*\\}", java.util.regex.Pattern.DOTALL);
+        java.util.regex.Matcher matcher = pattern.matcher(cleanedJsonContent);
+
+        if (matcher.find()) {
+            return matcher.group();
+        }
+
+        return cleanedJsonContent; // Si no ha encontrado '{', '}' devuelve la limpieza básica
+    }
+
+    private ExtractedData jsonToExtractedData (JsonNode rootNode, String userId) throws JsonProcessingException {
+        ExtractedData extractedData = objectMapper.treeToValue(rootNode, ExtractedData.class);
+        extractedData.setUser_id(userId);
+
+        return extractedData;
     }
 }
