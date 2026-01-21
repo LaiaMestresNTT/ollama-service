@@ -20,17 +20,25 @@ public class OllamaModelService {
         this.modelName = modelName;
     }
 
+    // Limita la respuesta para que no escriba de más y la temperatura sea menos creativa
+    Map<String, Object> options = Map.of(
+            "temperature", 0.0,
+            "num_predict", 100
+    );
+
     /**
      * Llamada genérica a la API /api/chat. Devuelve la respuesta como String JSON.
      * @param history Lista de mensajes, incluyendo el SYSTEM_PROMPT.
      * @return El contenido del mensaje del asistente (la cadena JSON).
      */
+
     public String callLlamaApi(List<Message> history) throws RuntimeException {
         // Construir el cuerpo de la petición
         Map<String, Object> requestBody = Map.of(
                 "model", modelName,
                 "messages", history,
-                "stream", false
+                "stream", false,
+                "options", options
         );
 
         // Llamada síncrona a la API de Ollama

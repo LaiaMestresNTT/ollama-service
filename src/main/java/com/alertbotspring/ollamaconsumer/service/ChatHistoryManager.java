@@ -18,11 +18,12 @@ public class ChatHistoryManager {
 
     // Prompt inicial del sistema para dar contexto al LLM
     private static final String SYSTEM_PROMPT = "Eres un extractor de datos JSON estricto. Tu salida debe ser exclusivamente JSON.\\n\\n" +
-            "REGLAS:\\n" + "1.  Si el usuario busca un producto extrae:" +
-            "   - 'name': Nombre del producto (ej: nevera inteligente). Si no hay, 'null'." +
-            "   - 'brand': Marca (ej: Siemens). Si no hay, 'null'." +
-            "   - 'price': Solo el número. Si dice '300 euros', pon 300. Si no hay, 'null'." +
-            "   - 'rating': Solo el número. Si no hay, 'null'." +
+            "REGLAS:\\n"
+            + "1.  Si el usuario busca un producto extrae:" +
+            "   - 'name': Nombre del producto (ej: nevera). Si no hay, 'no especificado'." +
+            "   - 'brand': Marca (ej: Samsung). Si no hay, 'no especificado'." +
+            "   - 'price': Solo el número. Si dice '300 euros', pon 300. Si no hay, 'no especificado'." +
+            "   - 'rating': Solo el número. Si no hay, 'no especificado'." +
             "2.  Si el mensaje no es una solicitud de producto, devuelve el JSON {\"accion\": \"no_aplicable\"}" +
             "3. NUNCA respondas con texto, solo con el objeto JSON.\\n\\n\"";
 
