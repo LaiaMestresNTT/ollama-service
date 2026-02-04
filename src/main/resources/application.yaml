@@ -35,10 +35,10 @@ spring:
         spring.deserializer.value.delegate.class: io.confluent.kafka.serializers.KafkaAvroDeserializer
         specific.avro.reader: true
 
-    ai:
-      openai:
-        api-key: ${SPRING_AI_OPENAI_API_KEY}
-        base-url: https://api.groq.com/openai
-        chat:
-          options:
-            model: llama-3.1-8b-instant
+  ai:
+    openai:
+      api-key: ${SPRING_AI_OPENAI_API_KEY}
+      base-url: https://api.groq.com/openai
+      chat:
+        options:
+          model: llama-3.1-8b-instant
