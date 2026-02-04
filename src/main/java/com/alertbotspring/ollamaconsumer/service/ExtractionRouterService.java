@@ -60,7 +60,7 @@ public class ExtractionRouterService {
 
                 // Enviar a Kafka para iniciar el proceso de scraping
                 String TOPIC = "nlp_results";
-                scraperProducer.sendMessage(TOPIC, extractedData, userId);
+                scraperProducer.sendMessage(extractedData, userId);
             }
 
         } catch (JsonProcessingException e) {

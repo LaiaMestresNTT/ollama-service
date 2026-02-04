@@ -73,6 +73,11 @@
             <artifactId>jsoup</artifactId>
             <version>1.15.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
+            <version>1.0.0-M5</version>
+        </dependency>
     </dependencies>
 
     <repositories>
@@ -80,6 +85,15 @@
             <id>confluent</id>
             <name>Confluent Maven Repository</name>
             <url>https://packages.confluent.io/maven/</url>
+        </repository>
+
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 

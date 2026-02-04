@@ -1,7 +1,7 @@
-ollama:
-  api:
+#ollama:
+ # api:
     #url: http://172.17.0.1:11434
-    url: http://host.docker.internal:11434
+  #  url: http://host.docker.internal:11434
 
 server:
   port: 8086
@@ -34,3 +34,11 @@ spring:
         spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
         spring.deserializer.value.delegate.class: io.confluent.kafka.serializers.KafkaAvroDeserializer
         specific.avro.reader: true
+
+    ai:
+      openai:
+        api-key: ${GROQ_API_KEY}
+        base-url: https://api.groq.com/openai
+        chat:
+          options:
+            model: llama3.1 8B
