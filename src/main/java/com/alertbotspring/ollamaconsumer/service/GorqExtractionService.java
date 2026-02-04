@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 public class GorqExtractionService {
     private final ChatClient chatClient;
 
-    public GorqExtractionService(ChatClient chatClient) {
-        this.chatClient = chatClient;
+    public GorqExtractionService(ChatClient.Builder chatClientBuilder) {
+        this.chatClient = chatClientBuilder.build();
     }
 
     private final String SYSTEM_PROMPT = "You are a strict JSON data extractor. Your output must be ONLY a valid JSON object.\n\n" +
@@ -28,9 +28,11 @@ public class GorqExtractionService {
     public DataDTO processMessage(String message) {
         var converter = new BeanOutputConverter<>(DataDTO.class);
 
+        String formatInstructions = converter.getFormat();
+
         String respuesta = this.chatClient.prompt()
                 .system(s -> s.text(SYSTEM_PROMPT))
-                .user(u -> u.text(message))
+                .user(u -> u.text(message + "\n\n" + formatInstructions))
                 .call()
                 .content();
 
