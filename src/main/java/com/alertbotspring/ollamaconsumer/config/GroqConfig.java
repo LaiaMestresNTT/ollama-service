@@ -13,9 +13,9 @@ public class GroqConfig {
 
     @Bean
     @Primary
-    public ChatClient.Builder customChatClientBuilder (
+    public ChatClient.Builder customChatClientBuilder(
             @Value("${SPRING_AI_OPENAI_API_KEY}") String apiKey,
-            @Value("${SPRING_AI_OPENAI_BASE_URL") String baseUrl) {
+            @Value("${SPRING_AI_OPENAI_BASE_URL}") String baseUrl) {
 
         var openAiApi = new OpenAiApi(baseUrl, apiKey);
         var chatModel = new OpenAiChatModel(openAiApi);
