@@ -41,7 +41,7 @@ public class WhatsAppConsumer {
 
         System.out.println("action: " + dataDTO.action());
 
-        if (!"no_aplicable".equals(dataDTO.action()) || !"no especificado".equals(dataDTO.name())) {
+        if (!"no_aplicable".equals(dataDTO.action()) && !"no especificado".equals(dataDTO.name())) {
             scraperProducer.sendNewMessage(dataDTO, userId);
         }
 
