@@ -13,7 +13,7 @@ public class GroqConfig {
 
     @Bean
     @Primary
-    public ChatClient.Builder chatClientBuilder (
+    public ChatClient.Builder customChatClientBuilder (
             @Value("${SPRING_AI_OPENAI_API_KEY}") String apiKey,
             @Value("${SPRING_AI_OPENAI_BASE_URL") String baseUrl) {
 
