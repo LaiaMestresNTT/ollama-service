@@ -39,6 +39,8 @@ public class WhatsAppConsumer {
         routerService.processIncomingMessage(userId, userPrompt); // Antigua función
         DataDTO dataDTO = gorqExtractionService.processMessage(userPrompt);
 
+        System.out.println("action: " + dataDTO.action());
+
         if (!"no_aplicable".equals(dataDTO.action()) || !"no especificado".equals(dataDTO.name())) {
             scraperProducer.sendNewMessage(dataDTO, userId);
         }
