@@ -6,10 +6,9 @@ spring:
   main:
     web-application-type: reactive
 
-  spring:
-    data:
-      mongodb:
-        uri: mongodb://mongodb_container:27017/alertbot_db?replicaSet=rs0
+  data:
+    mongodb:
+      uri: mongodb://mongodb_container:27017/alertbot_db?replicaSet=rs0
 
   kafka:
     #bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:broker:9092}
