@@ -16,13 +16,10 @@ public class FinalResultsConsumer {
     private final String GROUP_ID = "scraping-finished-group";
 
     private final FinalResponseService finalResponseService;
-    private final ScrapedProductRepository repository;
-    private final WhatsAppProducer whatsAppProducer;
 
-    public FinalResultsConsumer(FinalResponseService finalResponseService, ScrapedProductRepository repository, WhatsAppProducer whatsAppProducer) {
+    public FinalResultsConsumer(FinalResponseService finalResponseService) {
         this.finalResponseService = finalResponseService;
-        this.repository = repository;
-        this.whatsAppProducer = whatsAppProducer;
+
     }
 
     // consumidor que escucha el topic mlp_result y llamara a OllamaFinalResponse
@@ -36,15 +33,8 @@ public class FinalResultsConsumer {
 
         System.out.println("Scraping_finished recibido | requestId: " + requestId + " | productos: " + productCount);
 
-        // Buscar top 3 productos por score (aunque productCount sea 0, la lista vendrá vacía)
-        List<ScrapedProduct> topProducts = repository.findTop3ByRequestIdOrderByScoreDesc(requestId);
-
         // LLAMADA AL MODELO
-        String finalResponseMessage = finalResponseService.generateRecommendationMessage(topProducts);
-        System.out.println("Mensaje generado: " + finalResponseMessage);
-
-        // Mandar al topic whatsapp-out
-        //whatsAppProducer.sendMessage(userId, finalResponseMessage);
+        finalResponseService.generateSendRecommendationMessage(userId, requestId, productCount);
 
 
     }

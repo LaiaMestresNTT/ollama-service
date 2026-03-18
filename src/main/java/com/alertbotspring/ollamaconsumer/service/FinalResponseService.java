@@ -1,7 +1,9 @@
 package com.alertbotspring.ollamaconsumer.service;
 
 
+import com.alertbotspring.ollamaconsumer.kafka.WhatsAppProducer;
 import com.alertbotspring.ollamaconsumer.model.ScrapedProduct;
+import com.alertbotspring.ollamaconsumer.mongo.ScrapedProductRepository;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
@@ -12,51 +14,51 @@ public class FinalResponseService {
 
     // Este va a generar la respuesta de vuelta a whatsapp con el TOP 3 de productos
 
+    private final ScrapedProductRepository productRepository;
     private final ChatClient chatClient;
+    private final WhatsAppProducer whatsAppProducer;
 
-    public FinalResponseService(ChatClient.Builder chatClientBuilder) {
+    public FinalResponseService(ScrapedProductRepository productRepository, ChatClient.Builder chatClientBuilder, WhatsAppProducer whatsAppProducer) {
+        this.productRepository = productRepository;
         this.chatClient = chatClientBuilder.build();
+        this.whatsAppProducer = whatsAppProducer;
     }
 
-    private static final String SYSTEM_PROMPT =
-            "Eres un asistente de compras amigable que ayuda a los usuarios por WhatsApp. " +
-                    "Tu tarea es redactar un mensaje natural, breve y personalizado en español recomendando productos de Amazon. " +
-                    "El mensaje debe sonar cercano, no robótico. Usa emojis con moderación. " +
-                    "Si no hay productos disponibles, comunícalo con amabilidad y sugiere intentar con otros criterios.";
+    private static final String SYSTEM_PROMPT = "You are a helpful shopping assistant. " +
+            "Given a list of products found on Amazon, write a friendly WhatsApp message in Spanish " +
+            "presenting the top results. For each product include: name, price, rating and URL. " +
+            "Keep it concise and use emojis. If no products are provided, apologize and suggest trying different search terms.";
 
 
-    public String generateRecommendationMessage(List<ScrapedProduct> products) {
-        String userContent = buildPrompt(products);
+    public void generateSendRecommendationMessage(String userId, String requestId, int productCount) {
+        String userContent;
 
-        return chatClient.prompt()
+        if (productCount > 0) {
+            List<ScrapedProduct> products = productRepository.findTop3ByRequestIdOrderByScoreDesc(requestId);
+            userContent = buildProductsPrompt(products);
+        } else {
+            userContent = "No products were found for this search.";
+        }
+
+        String responseMessage = chatClient.prompt()
                 .system(SYSTEM_PROMPT)
                 .user(userContent)
                 .call()
                 .content();
+        System.out.println("Mensaje generado: " + responseMessage);
+
+        // Llamar al productor
+        whatsAppProducer.sendMessage(userId, responseMessage);
     }
 
-    private String buildPrompt(List<ScrapedProduct> products) {
-        if (products == null || products.isEmpty()) {
-            return "No encontré ningún producto que cumpla los criterios de búsqueda del usuario. " +
-                    "Genera un mensaje amable indicando que no se encontraron resultados y sugiere afinar la búsqueda.";
+    private String buildProductsPrompt(List<ScrapedProduct> products) {
+        StringBuilder sb = new StringBuilder("Here are the products found:\n");
+        for (ScrapedProduct p : products) {
+            sb.append("- Name: ").append(p.getName()).append("\n");
+            sb.append("  Price: ").append(p.getPrice()).append("€\n");
+            sb.append("  Rating: ").append(p.getRating()).append("\n");
+            sb.append("  URL: ").append(p.getURL()).append("\n\n");
         }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("He encontrado los siguientes productos en Amazon para el usuario. ")
-                .append("Genera un mensaje de WhatsApp recomendándolos de forma natural:\n\n");
-
-        for (int i = 0; i < products.size(); i++) {
-            ScrapedProduct p = products.get(i);
-            sb.append(i + 1).append(". ")
-                    .append("Nombre: ").append(p.getName()).append("\n")
-                    .append("   Marca: ").append(p.getBrand()).append("\n")
-                    .append("   Precio: ").append(p.getPrice()).append("€\n")
-                    .append("   Valoración: ").append(p.getRating()).append("/5")
-                    .append(" (").append(p.getRatingCount()).append(" reseñas)\n")
-                    .append("   Score de calidad: ").append(p.getScore()).append("\n")
-                    .append("   Enlace: ").append(p.getURL()).append("\n\n");
-        }
-
         return sb.toString();
     }
 }
