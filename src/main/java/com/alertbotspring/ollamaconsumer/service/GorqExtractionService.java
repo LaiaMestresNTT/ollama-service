@@ -14,16 +14,21 @@ public class GorqExtractionService {
         this.chatClient = chatClientBuilder.build();
     }
 
-    private final String SYSTEM_PROMPT = "You are a strict JSON data extractor. Your output must be ONLY a valid JSON object.\n\n" +
-            "RULES:\n" +
-            "1. If the user is looking for a product, extract:\n" +
-            "   - 'name': Product name (e.g., fridge). If not present, 'no especificado'.\n" +
-            "   - 'brand': Brand (e.g., Samsung). If not present, 'no especificado'.\n" +
-            "   - 'price': Numeric value only. If the user says '300 euros', return 300. If not present, 'null'.\n" +
-            "   - 'rating': Numeric value only. If not present, 'null'.\n" +
-            "2. If the message is NOT a product request, return exactly: {\"action\": \"no_aplicable\"}\n" +
-            "3. NEVER respond with conversational text, ONLY the JSON object.\n\n";
-
+    private final String SYSTEM_PROMPT = "You are a strict JSON data extractor. Your output must be ONLY a valid JSON object, no extra text.\n\n" +
+            "A product request is any message where the user mentions wanting, searching, or looking for a product to buy.\n\n" +
+            "If it IS a product request, return:\n" +
+            "{\"name\": \"<product>\", \"brand\": \"<brand>\", \"price\": \"<number or no especificado>\", \"rating\": \"<number or no especificado>\", \"action\": \"buscar_producto\"}\n\n" +
+            "If it is NOT a product request, return:\n" +
+            "{\"action\": \"no_aplicable\"}\n\n" +
+            "EXAMPLES:\n" +
+            "User: Buenas bot estoy buscando un ordenador Samsung de 600€ con valoración 3\n" +
+            "Output: {\"name\": \"ordenador\", \"brand\": \"Samsung\", \"price\": \"600\", \"rating\": \"3\", \"action\": \"buscar_producto\"}\n\n" +
+            "User: Buenas bot quiero unos auriculares Apple\n" +
+            "Output: {\"name\": \"auriculares\", \"brand\": \"Apple\", \"price\": \"no especificado\", \"rating\": \"no especificado\", \"action\": \"buscar_producto\"}\n\n" +
+            "User: I'm looking for a Samsung fridge under 800€\n" +
+            "Output: {\"name\": \"fridge\", \"brand\": \"Samsung\", \"price\": \"800\", \"rating\": \"no especificado\", \"action\": \"buscar_producto\"}\n\n" +
+            "User: Hola, ¿cómo estás?\n" +
+            "Output: {\"action\": \"no_aplicable\"}\n\n";
 
     public DataDTO processMessage(String message) {
         var converter = new BeanOutputConverter<>(DataDTO.class);
