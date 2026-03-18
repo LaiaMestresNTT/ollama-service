@@ -4,8 +4,6 @@ import com.alertbot.avro.ConfirmScraped;
 import com.alertbotspring.ollamaconsumer.model.ScrapedProduct;
 import com.alertbotspring.ollamaconsumer.mongo.ScrapedProductRepository;
 import com.alertbotspring.ollamaconsumer.service.FinalResponseService;
-import com.alertbotspring.ollamaconsumer.service.OllamaModelService;
-import com.alertbot.avro.WhatsAppMessage;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +44,7 @@ public class FinalResultsConsumer {
         System.out.println("Mensaje generado: " + finalResponseMessage);
 
         // Mandar al topic whatsapp-out
-        whatsAppProducer.sendMessage(userId, finalResponseMessage);
+        //whatsAppProducer.sendMessage(userId, finalResponseMessage);
 
 
     }

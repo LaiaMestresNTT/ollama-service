@@ -16,6 +16,10 @@ public class MongoConnectorConfigService {
 
     private final WebClient webClient;
     private final String CONNECT_URL = "http://localhost:8083/connectors"; // ollama-service esta fuera de la red de los contenedores
+    private static final String TOPIC = "nlp_results";
+    private static final String DATA_BASE= "alertbot_db";
+    private static final String COLLECTION = "product_requests";
+    private static final String ID_FIELD_NAME = "request_id";
 
     public MongoConnectorConfigService(WebClient.Builder webClientBuilder) {
         this.webClient = webClientBuilder.build();
@@ -50,21 +54,20 @@ public class MongoConnectorConfigService {
     }
 
     private static Map<String, Object> getRequestBody(String connectorName) {
-        String idFieldName = "request_id";
 
         Map<String, Object> config = Map.ofEntries(
                 Map.entry("connector.class", "com.mongodb.kafka.connect.MongoSinkConnector"),
                 Map.entry("tasks.max", "1"),
-                Map.entry("topics", "nlp_results"),
+                Map.entry("topics", TOPIC),
                 Map.entry("connection.uri", "mongodb://mongodb_container:27017/?replicaSet=rs0"),
-                Map.entry("database", "alertbot_db"),
-                Map.entry("collection", "product_requests"),
+                Map.entry("database", DATA_BASE),
+                Map.entry("collection", COLLECTION),
                 Map.entry("key.converter", "org.apache.kafka.connect.storage.StringConverter"),
                 Map.entry("value.converter", "io.confluent.connect.avro.AvroConverter"),
                 Map.entry("value.converter.schema.registry.url", "http://schema-registry:8081"),
                 Map.entry("document.id.strategy", "com.mongodb.kafka.connect.sink.processor.id.strategy.PartialValueStrategy"),
                 Map.entry("document.id.strategy.partial.value.projection.type", "allowlist"),
-                Map.entry("document.id.strategy.partial.value.projection.list", idFieldName),
+                Map.entry("document.id.strategy.partial.value.projection.list", ID_FIELD_NAME),
                 Map.entry("writemodel.strategy", "com.mongodb.kafka.connect.sink.writemodel.strategy.ReplaceOneBusinessKeyStrategy")
         );
 

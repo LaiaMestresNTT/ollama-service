@@ -1,7 +1,6 @@
 package com.alertbotspring.ollamaconsumer.kafka;
 
 import com.alertbotspring.ollamaconsumer.model.DataDTO;
-import com.alertbotspring.ollamaconsumer.service.ExtractionRouterService;
 import com.alertbot.avro.WhatsAppMessage;
 import com.alertbotspring.ollamaconsumer.service.GorqExtractionService;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -13,12 +12,10 @@ public class WhatsAppConsumer {
     private final String TOPIC = "whatsapp-in";
     private final String GROUP_ID = "whatsapp-in-group";
 
-    private final ExtractionRouterService routerService;
     private final GorqExtractionService gorqExtractionService;
     private final ScraperProducer scraperProducer;
 
-    public WhatsAppConsumer(ExtractionRouterService routerService, GorqExtractionService gorqExtractionService, ScraperProducer scraperProducer) {
-        this.routerService = routerService;
+    public WhatsAppConsumer(GorqExtractionService gorqExtractionService, ScraperProducer scraperProducer) {
         this.gorqExtractionService = gorqExtractionService;
         this.scraperProducer = scraperProducer;
     }
@@ -36,7 +33,6 @@ public class WhatsAppConsumer {
         System.out.println("✅ Mensaje Avro recibido al topic " + TOPIC + ": " + whatsAppMessage.getText());
 
         // LLAMADA AL MODELO
-        routerService.processIncomingMessage(userId, userPrompt); // Antigua función
         DataDTO dataDTO = gorqExtractionService.processMessage(userPrompt);
 
         System.out.println("action: " + dataDTO.action());

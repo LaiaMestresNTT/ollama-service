@@ -1,0 +1,9 @@
+{
+  "type": "record",
+  "name": "WhatsAppResponse",
+  "namespace": "com.alertbot.avro",
+  "fields": [
+    { "name": "user_id", "type": "string" },
+    { "name": "message", "type": "string" }
+  ]
+}
