@@ -21,7 +21,6 @@ public class MongoConnectorConfigService {
         this.webClient = webClientBuilder.build();
     }
 
-    // Cambiamos @PostConstruct por este listener
     @EventListener(ApplicationReadyEvent.class)
     public void setupConnector() {
         String connectorName = "mongo-sink-nlp-results";

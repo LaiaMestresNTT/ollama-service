@@ -14,4 +14,13 @@ public class WhatsAppProducer {
     }
 
     // manda la respuesta generada por el OllamaFinalResponseService al topic whatsapp-out
+
+    public void sendMessage(String userId, String message) {
+        try {
+            kafkaTemplate.send(TOPIC, userId, message);
+            System.out.println("🚀 Mensaje enviado a whatsapp-out para userId: " + userId);
+        } catch (Exception e) {
+            System.err.println("❌ ERROR al enviar a whatsapp-out: " + e.getMessage());
+        }
+    }
 }
