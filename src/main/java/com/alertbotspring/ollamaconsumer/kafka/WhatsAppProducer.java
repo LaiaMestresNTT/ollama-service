@@ -18,7 +18,7 @@ public class WhatsAppProducer {
 
     public void sendMessage(String userId, String message) {
 
-        WhatsAppResponse response = WhatsappResponse.newBuilder()
+        WhatsAppResponse response = WhatsAppResponse.newBuilder()
                 .setUserId(userId)
                 .setMessage(message)
                 .build();
