@@ -15,7 +15,7 @@ import java.util.Map;
 public class MongoConnectorConfigService {
 
     private final WebClient webClient;
-    private final String CONNECT_URL = "http://localhost:8083/connectors"; // ollama-service esta fuera de la red de los contenedores
+    private final String CONNECT_URL = "http://connect:8083/connectors"; // ollama-service esta fuera de la red de los contenedores
     private static final String TOPIC = "nlp_results";
     private static final String DATA_BASE= "alertbot_db";
     private static final String COLLECTION = "product_requests";
